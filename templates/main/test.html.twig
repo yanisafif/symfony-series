@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+    {% block body %}
+        <h2>On va faire plein de tests</h2>
+
+        {# Commentaire #}
+        {% set name="Guillaume" %}
+        {# En twig lorsque l'on mets | on peut mettre des filtres comme dans php mais avec une sintaxe particuliètre #}
+        <h2>{{ name|upper }}</h2>
+        <h2>{{ name|length }}</h2>
+
+        {# Filtre date #}
+        <div>{{ "now"|date('m') }}</div>
+
+        {# Crée un tableau #}
+        {% set colors=["Orange", "brown", "red", "blue"] %}
+
+        <p>nombre de couleur {{ colors|length }}</p>
+        <p>{{ colors|join(' / ') }}</p>
+            {# foreach en twig deviens for et c'est l'inverse d'abbord la valeur puis ensuite le nom du tableau #}
+        {% for color in colors %}
+            <div>{{ loop.index }}</div>
+            <div style="background-color: {{ color }}">{{ color }}</div>
+        {% endfor %}
+
+
+        {# Un objet en twig #}
+        {% set book = {title: 'pifpaf', year:2000, author: "John Doe"} %}
+        <h3>{{ book.author }}</h3>
+
+        <div>
+            {% for key, val in book %}
+                <div>{{ key }} : {{ val }}</div>
+            {% endfor %}
+        </div>
+        {% endblock %}
+        {% block title %}{{parent()}} | Test{% endblock %}

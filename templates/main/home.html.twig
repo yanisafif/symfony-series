@@ -1,0 +1,8 @@
+{% extends 'base.html.twig' %}
+
+    {% block body %}
+    <h1>COUCOU</h1>
+    {% endblock %}
+
+    {# parent() viens donner avec un echo ce qui est initialement mis #}
+    {% block title %}{{parent()}} | Home{% endblock %}
