@@ -6,6 +6,7 @@ use App\Entity\Serie;
 use App\Form\SerieType;
 use App\Repository\SerieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,6 +38,11 @@ class SerieController extends AbstractController
     public function details(int $id, SerieRepository $serieRepository): Response
     {
         $serie = $serieRepository->find($id);
+        if(!$serie){
+            throw $this->createNotFoundException('Ohhhh nooooooo!!!');
+        }
+
+
         return $this->render('serie/details.html.twig', [
             "serie" => $serie
         ]);
@@ -44,12 +50,26 @@ class SerieController extends AbstractController
     /**
      * @Route("/create", name="create")
      */
-    public function create(): Response
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
         $serie = new Serie();
+        $serie->setDateCreated(new \DateTime());
         $serieForm = $this->createForm(SerieType::class, $serie);
 
-        //todo: traiter le formulaire
+        // Pour envoyer à la même page les infos
+        // faire un dump de serie pour voir
+        $serieForm->handleRequest($request);
+
+        if ($serieForm->isSubmitted() && $serieForm->isValid()){
+
+            $entityManager->persist($serie);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Serie added ! Good Job!');
+
+            return $this->redirectToRoute('series_details', ['id' => $serie->getId()]);
+        }
+
 
         return $this->render('serie/create.html.twig', [
             'serieForm' => $serieForm->createView()
@@ -94,5 +114,13 @@ class SerieController extends AbstractController
         return $this->render('serie/create.html.twig', [
 
         ]);
+    }
+    /**
+     * @Route("/delete/{id}", name="delete")
+     */
+    public function delete(Serie $serie, EntityManagerInterface $entityManager){
+        $entityManager->remove($serie);
+        $entityManager->flush();
+        return $this->redirectToRoute('main_home');
     }
 }
